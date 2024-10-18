@@ -206,16 +206,15 @@ class IsClose(Function):
 class Permute(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, dims: Tensor) -> Tensor:
-        # Save the permutation dims for backward
         ctx.save_for_backward(dims)
         return a.f.permute(a, dims)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, None]:
         (dims,) = ctx.saved_values
-        # Compute the inverse permutation
-        inv_dims = np.argsort(dims.numpy())
-        # Permute the gradient back to the original dimension order
+        inv_dims = [0] * len(dims)
+        for i, dim in enumerate(dims):
+            inv_dims[dim] = i
         return grad_output.f.permute(grad_output, inv_dims), None
 
 
@@ -230,14 +229,13 @@ class View(Function):
         )
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
-        """Matrix Multiply backward (module 3)"""
+    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, None]:
         (original,) = ctx.saved_values
         return (
             minitorch.Tensor.make(
                 grad_output._tensor._storage, original, backend=grad_output.backend
             ),
-            0.0,
+            None,
         )
 
 

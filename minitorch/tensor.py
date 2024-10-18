@@ -285,3 +285,60 @@ class Tensor:
 
     # Functions
     # TODO: Implement for Task 2.3.
+
+    def __add__(self, b: TensorLike) -> Tensor:
+        return Add.apply(self, self._ensure_tensor(b))
+
+    def __sub__(self, b: TensorLike) -> Tensor:
+        return Add.apply(self, Neg.apply(self._ensure_tensor(b)))
+
+    def __mul__(self, b: TensorLike) -> Tensor:
+        return Mul.apply(self, self._ensure_tensor(b))
+
+    def __lt__(self, b: TensorLike) -> Tensor:
+        return LT.apply(self, self._ensure_tensor(b))
+
+    def __eq__(self, b: TensorLike) -> Tensor:
+        return EQ.apply(self, self._ensure_tensor(b))
+
+    def __gt__(self, b: TensorLike) -> Tensor:
+        return NE.apply(self, self._ensure_tensor(b))
+
+    def __neg__(self) -> Tensor:
+        return Neg.apply(self)
+
+    def __radd__(self, b: TensorLike) -> Tensor:
+        return Add.apply(self._ensure_tensor(b), self)
+
+    def __rmul__(self, b: TensorLike) -> Tensor:
+        return Mul.apply(self._ensure_tensor(b), self)
+
+    def all(self) -> Tensor:
+        return All.apply(self)
+
+    def isclose(self, b: TensorLike) -> Tensor:
+        return IsClose.apply(self, self._ensure_tensor(b))
+
+    def sigmoid(self) -> Tensor:
+        return Sigmoid.apply(self)
+
+    def relu(self) -> Tensor:
+        return ReLU.apply(self)
+
+    def log(self) -> Tensor:
+        return Log.apply(self)
+
+    def exp(self) -> Tensor:
+        return Exp.apply(self)
+
+    def sum(self, dim: Optional[int] = None) -> Tensor:
+        return Sum.apply(self, dim)
+
+    def mean(self, dim: Optional[int] = None) -> Tensor:
+        return Mean.apply(self, dim)
+
+    def permute(self, *dims: int) -> Tensor:
+        return Permute.apply(self, dims)
+
+    def view(self, *shape: int) -> Tensor:
+        return View.apply(self, shape)
