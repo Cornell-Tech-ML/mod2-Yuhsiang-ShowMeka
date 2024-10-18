@@ -64,10 +64,9 @@ def to_index(ordinal: int, shape: Shape, out_index: OutIndex) -> None:
 
     """
     # TODO: Implement for Task 2.1.
-    for i in range(len(shape)):
+    for i in range(len(shape) -1 , -1 , -1):
         out_index[i] = ordinal % shape[i]
         ordinal = ordinal // shape[i]
-    return out_index
 
 
 def broadcast_index(
@@ -112,15 +111,22 @@ def shape_broadcast(shape1: UserShape, shape2: UserShape) -> UserShape:
 
     """
     # TODO: Implement for Task 2.2.
-    for i in range(len(shape1)):
-        if shape1[i] != shape2[i]:
-            if shape1[i] == 1:
-                shape1[i] = shape2[i]
-            elif shape2[i] == 1:
-                shape2[i] = shape1[i]
-            else:
-                raise IndexingError("Cannot broadcast shapes")
-    return shape1
+    if len(shape1) < len(shape2):
+        shape1, shape2 = shape2, shape1
+
+    shape2 = (1,) * (len(shape1) - len(shape2)) + tuple(shape2)
+
+    new_shape = []
+    for s1, s2 in zip(shape1, shape2):
+        if s1 == s2:
+            new_shape.append(s1)
+        elif s1 == 1:
+            new_shape.append(s2)
+        elif s2 == 1:
+            new_shape.append(s1)
+        else:
+            raise IndexingError("Cannot broadcast shapes")
+    return tuple(new_shape)
 
 
 def strides_from_shape(shape: UserShape) -> UserStrides:
