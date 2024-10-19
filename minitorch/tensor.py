@@ -284,10 +284,10 @@ class Tensor:
         return self._tensor.shape
 
     def size(self) -> int:
-        return self._tensor.size
+        return int(operators.prod(self.shape))
 
     def dims(self) -> int:
-        return self._tensor.dims
+        return len(self.shape)
 
     # Functions
     # TODO: Implement for Task 2.3.
@@ -340,7 +340,8 @@ class Tensor:
     def sum(self, dim: Optional[int] = None) -> Tensor:
         if dim is not None:
             return Sum.apply(self, self._ensure_tensor(dim))
-        return Sum.apply(self.contiguous().view(self.size), self._ensure_tensor(0))
+        else:
+            return Sum.apply(self.contiguous().view(self.size), self._ensure_tensor(0))
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         if dim is not None:
@@ -348,7 +349,7 @@ class Tensor:
         return self.sum() / self.size
 
     def permute(self, *dims: int) -> Tensor:
-        return Permute.apply(self, dims)
+        return Permute.apply(self, tensor(list(dims)))
 
     def view(self, *shape: int) -> Tensor:
         return View.apply(self, tensor(list(shape)))
