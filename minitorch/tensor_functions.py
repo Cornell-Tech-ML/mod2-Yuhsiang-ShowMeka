@@ -165,14 +165,14 @@ class Exp(Function):
 
 class Sum(Function):
     @staticmethod
-    def forward(ctx: Context, a: Tensor, dim: Tensor) -> Tensor:
+    def forward(ctx: Context, a: Tensor, dim: int) -> Tensor:
         ctx.save_for_backward(a, dim)
-        return a.f.add_reduce(a, int(dim.item()))
+        return a.f.add_reduce(a, dim)
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
+    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, None]:
         a, dim = ctx.saved_values
-        return grad_output.f.add_reduce(a, int(dim.item())), None
+        return grad_output.f.add_reduce(a, dim), None
 
 class LT(Function):
     @staticmethod

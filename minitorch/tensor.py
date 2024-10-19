@@ -302,7 +302,7 @@ class Tensor:
         return EQ.apply(self, self._ensure_tensor(b))
 
     def __gt__(self, b: TensorLike) -> Tensor:
-        return NE.apply(self, self._ensure_tensor(b))
+        return LT.apply(self._ensure_tensor(b), self)
 
     def __neg__(self) -> Tensor:
         return Neg.apply(self)
