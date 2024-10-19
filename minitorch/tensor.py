@@ -321,10 +321,13 @@ class Tensor:
     def __rmul__(self, b: TensorLike) -> Tensor:
         return Mul.apply(self._ensure_tensor(b), self)
 
-    def all(self) -> Tensor:
-        return All.apply(self)
+    def all(self, dim: Optional[int] = None) -> Tensor:
+        if dim is not None:
+            return All.apply(self, self._ensure_tensor(dim))
+        else:
+            return All.apply(self.view(self.size), self._ensure_tensor(0))
 
-    def isclose(self, b: TensorLike) -> Tensor:
+    def is_close(self, b: TensorLike) -> Tensor:
         return IsClose.apply(self, self._ensure_tensor(b))
 
     def sigmoid(self) -> Tensor:
