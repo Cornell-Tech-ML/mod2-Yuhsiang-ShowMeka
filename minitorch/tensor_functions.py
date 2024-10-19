@@ -176,7 +176,7 @@ class Sum(Function):
     @staticmethod
     def forward(ctx: Context, a:Tensor, dim: Tensor) -> Tensor:
 
-        return a.f.add_reduce(a, dim)
+        return a.f.add_reduce(a, int(dim.item()))
     
 
     @staticmethod
