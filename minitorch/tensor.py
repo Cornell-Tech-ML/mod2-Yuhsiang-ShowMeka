@@ -332,7 +332,9 @@ class Tensor:
         return Exp.apply(self)
 
     def sum(self, dim: Optional[int] = None) -> Tensor:
-        return Sum.apply(self, self._ensure_tensor(dim))
+        if dim is None:
+            return Sum.apply(self, 0)
+        return Sum.apply(self, dim)
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         return Mean.apply(self, dim)
