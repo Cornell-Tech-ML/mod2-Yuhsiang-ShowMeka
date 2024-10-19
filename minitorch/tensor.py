@@ -352,8 +352,8 @@ class Tensor:
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         if dim is not None:
-            return self.sum(dim) / self.shape[dim]
-        return self.sum() / self.size
+            return Mul.apply(Sum.apply(self, self._ensure_tensor(dim)), Inv.apply(self._ensure_tensor(self.shape[dim])))
+        return Mul.apply(Sum.apply(self, self._ensure_tensor(0)), Inv.apply(self._ensure_tensor(self.size)))
 
     def permute(self, *dims: int) -> Tensor:
         return Permute.apply(self, tensor(list(dims)))
