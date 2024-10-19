@@ -283,6 +283,12 @@ class Tensor:
         """
         return self._tensor.shape
 
+    def size(self) -> int:
+        return self._tensor.size
+
+    def dims(self) -> int:
+        return self._tensor.dims
+
     # Functions
     # TODO: Implement for Task 2.3.
 
