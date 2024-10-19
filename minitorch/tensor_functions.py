@@ -161,7 +161,7 @@ class Exp(Function):
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         (a,) = ctx.saved_values
-        return grad_output.f.exp_map(a)
+        return grad_output * a.f.exp_map(a)
 
 class Sum(Function):
     @staticmethod

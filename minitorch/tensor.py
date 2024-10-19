@@ -342,3 +342,6 @@ class Tensor:
 
     def view(self, *shape: int) -> Tensor:
         return View.apply(self, shape)
+
+    def zero_grad_(self) -> None:
+        self.grad = None
