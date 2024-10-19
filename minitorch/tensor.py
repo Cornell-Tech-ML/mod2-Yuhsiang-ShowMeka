@@ -283,9 +283,11 @@ class Tensor:
         """
         return self._tensor.shape
 
+    @property
     def size(self) -> int:
         return int(operators.prod(self.shape))
 
+    @property
     def dims(self) -> int:
         return len(self.shape)
 
