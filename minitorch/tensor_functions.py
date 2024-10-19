@@ -5,6 +5,7 @@ from __future__ import annotations
 import random
 from typing import TYPE_CHECKING, Optional
 
+from hypothesis.strategies._internal.strategies import OneOfStrategy
 import numpy as np
 
 import minitorch
@@ -173,15 +174,14 @@ class Exp(Function):
 
 class Sum(Function):
     @staticmethod
-    def forward(ctx: Context, a:Tensor, dim:Tensor) -> Tensor:
-        ctx.save_for_backward(a.shape, dim)
+    def forward(ctx: Context, a:Tensor, dim: Tensor) -> Tensor:
 
-        return a.f.add_reduce(a, int(dim.item()))
+        return a.f.add_reduce(a, dim)
     
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
-        a, dim = ctx.saved_values
+
         return grad_output, 0.0
 
 
@@ -330,7 +330,6 @@ def rand(
     tensor = minitorch.Tensor.make(vals, shape, backend=backend)
     tensor.requires_grad_(requires_grad)
     return tensor
-
 
 def _tensor(
     ls: Any,
