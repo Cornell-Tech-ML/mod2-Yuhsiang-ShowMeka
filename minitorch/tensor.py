@@ -332,18 +332,20 @@ class Tensor:
         return Exp.apply(self)
 
     def sum(self, dim: Optional[int] = None) -> Tensor:
-        if dim is None:
-            return Sum.apply(self, 0)
-        return Sum.apply(self, dim)
+        if dim is not None:
+            return Sum.apply(self, self._ensure_tensor(dim))
+        return Sum.apply(self.contiguous().view(self.size), self._ensure_tensor(0))
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
-        return Mean.apply(self, dim)
+        if dim is not None:
+            return self.sum(dim) / self.shape[dim]
+        return self.sum() / self.size
 
     def permute(self, *dims: int) -> Tensor:
         return Permute.apply(self, dims)
 
     def view(self, *shape: int) -> Tensor:
-        return View.apply(self, shape)
+        return View.apply(self, tensor(list(shape)))
 
     def zero_grad_(self) -> None:
         self.grad = None

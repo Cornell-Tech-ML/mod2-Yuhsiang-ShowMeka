@@ -173,33 +173,31 @@ class Exp(Function):
 
 class Sum(Function):
     @staticmethod
-    def forward(ctx: Context, a: Tensor, dim: Optional[int]) -> Tensor:
-        ctx.save_for_backward(a, dim)
-        if dim is not None:
-            return a.f.add_reduce(a, dim)
-        else:
-            return a.f.add_reduce(a.contiguous().view(int(operators.prod(a.shape))), 0)
+    def forward(ctx: Context, a: Tensor, dim: Tensor) -> Tensor:
+        ctx.save_for_backward(a.shape, dim)
+        
+        return a.f.add_reduce(a, int(dim.item()))
 
     @staticmethod
-    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, None]:
+    def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
         a, dim = ctx.saved_values
-        if dim is None:
-            out = grad_output.zeros(a.shape)
-            out._tensor._storage[:] = grad_output[0]
-            return out, None
-        else:
-            return grad_output.expand(a), None
+        #grad_input = grad_output.f.expand(grad_output, a.shape, int(dim.item()))
+        return grad_output, 0.0
 
 
 class LT(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, b: Tensor) -> Tensor:
+        ctx.save_for_backward(a, b)
         return a.f.lt_zip(a, b)
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
-        (a, b) = ctx.saved_values
-        return grad_output.f.lt_zip(a, b), grad_output.f.lt_zip(b, a)
+        a, b = ctx.saved_values
+        
+        zeros_a = a.zeros(a.shape)
+        zeros_b = b.zeros(b.shape)
+        return zeros_a, zeros_b
 
 class EQ(Function):
     @staticmethod
