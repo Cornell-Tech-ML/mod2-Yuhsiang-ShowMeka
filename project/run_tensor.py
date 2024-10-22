@@ -31,11 +31,12 @@ class Linear(minitorch.Module):
         super().__init__()
         self.weight = RParam(in_features, out_features)
         self.bias = RParam(out_features)
+        self.out_size = out_features
 
     def forward(self, x):
         batch, in_features = x.shape
         return (
-            self.weights.value.view(1, in_features, self.out_size)
+            self.weight.value.view(1, in_features, self.out_size)
             * x.view(batch, in_features, 1)
         ).sum(1).view(batch, self.out_size) + self.bias.value.view(self.out_size)
 
