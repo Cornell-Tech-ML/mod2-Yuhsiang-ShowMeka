@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import random
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
-from hypothesis.strategies._internal.strategies import OneOfStrategy
 import numpy as np
 
 import minitorch
@@ -114,6 +113,7 @@ class All(Function):
 
 # TODO: Implement for Task 2.3.
 
+
 class Mul(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, b: Tensor) -> Tensor:
@@ -125,7 +125,11 @@ class Mul(Function):
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         """Backward pass for the multiplication of two tensors"""
         a, b = ctx.saved_values
-        return (grad_output.f.mul_zip(grad_output, b), grad_output.f.mul_zip(grad_output, a))
+        return (
+            grad_output.f.mul_zip(grad_output, b),
+            grad_output.f.mul_zip(grad_output, a),
+        )
+
 
 class Sigmoid(Function):
     @staticmethod
@@ -139,15 +143,16 @@ class Sigmoid(Function):
     def backward(ctx: Context, grad_output: Tensor) -> Tensor:
         """Backward pass for the sigmoid function"""
         (sig,) = ctx.saved_values
-        
+
         # Calculate 1 - sig
         one_minus_sig = grad_output.f.add_zip(tensor(1), sig.f.neg_map(sig))
-        
+
         # Calculate sig * (1 - sig)
         sigmoid_grad = grad_output.f.mul_zip(sig, one_minus_sig)
-        
+
         # Multiply sigmoid_grad with grad_output
         return grad_output.f.mul_zip(sigmoid_grad, grad_output)
+
 
 class ReLU(Function):
     @staticmethod
@@ -162,6 +167,7 @@ class ReLU(Function):
         (a,) = ctx.saved_values
         return grad_output.f.relu_back_zip(a, grad_output)
 
+
 class Log(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor) -> Tensor:
@@ -174,6 +180,7 @@ class Log(Function):
         """Backward pass for the log function"""
         (a,) = ctx.saved_values
         return grad_output.f.log_back_zip(a, grad_output)
+
 
 class Exp(Function):
     @staticmethod
@@ -188,12 +195,12 @@ class Exp(Function):
         (a,) = ctx.saved_values
         return grad_output * a.f.exp_map(a)
 
+
 class Sum(Function):
     @staticmethod
-    def forward(ctx: Context, a:Tensor, dim: Tensor) -> Tensor:
+    def forward(ctx: Context, a: Tensor, dim: Tensor) -> Tensor:
         """Forward pass for the sum function"""
         return a.f.add_reduce(a, int(dim.item()))
-    
 
     @staticmethod
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, float]:
@@ -212,10 +219,11 @@ class LT(Function):
     def backward(ctx: Context, grad_output: Tensor) -> Tuple[Tensor, Tensor]:
         """Backward pass for the less than function"""
         a, b = ctx.saved_values
-        
+
         zeros_a = a.zeros(a.shape)
         zeros_b = b.zeros(b.shape)
         return zeros_a, zeros_b
+
 
 class EQ(Function):
     @staticmethod
@@ -233,11 +241,13 @@ class EQ(Function):
         zeros_b = b.zeros(b.shape)
         return zeros_a, zeros_b
 
+
 class IsClose(Function):
     @staticmethod
     def forward(ctx: Context, a: Tensor, b: Tensor) -> Tensor:
         """Forward pass for the is close function"""
         return a.f.is_close_zip(a, b)
+
 
 class Permute(Function):
     @staticmethod
@@ -355,6 +365,7 @@ def rand(
     tensor.requires_grad_(requires_grad)
     return tensor
 
+
 def _tensor(
     ls: Any,
     shape: UserShape,
@@ -461,4 +472,3 @@ but was expecting derivative %f from central difference.
             1e-2,
             err_msg=err_msg % (f, vals, x.grad[ind], i, ind, check),
         )
-

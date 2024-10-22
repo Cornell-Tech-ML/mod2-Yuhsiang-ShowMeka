@@ -197,6 +197,7 @@ class Tensor:
 
     def zeros(self, shape: Optional[UserShape] = None) -> Tensor:
         """Create a tensor of zeros with the given shape"""
+
         def zero(shape: UserShape) -> Tensor:
             return Tensor.make(
                 [0.0] * int(operators.prod(shape)), shape, backend=self.backend
@@ -369,16 +370,20 @@ class Tensor:
         """Sum the tensor over a given dimension"""
         if dim is not None:
             return Sum.apply(self, self._ensure_tensor(dim))
-        
-        return Sum.apply(
-            self.contiguous().view(self.size), self._ensure_tensor(0))
-            
+
+        return Sum.apply(self.contiguous().view(self.size), self._ensure_tensor(0))
 
     def mean(self, dim: Optional[int] = None) -> Tensor:
         """Compute the mean of the tensor over a given dimension"""
         if dim is not None:
-            return Mul.apply(Sum.apply(self, self._ensure_tensor(dim)), Inv.apply(self._ensure_tensor(self.shape[dim])))
-        return Mul.apply(Sum.apply(self, self._ensure_tensor(0)), Inv.apply(self._ensure_tensor(self.size)))
+            return Mul.apply(
+                Sum.apply(self, self._ensure_tensor(dim)),
+                Inv.apply(self._ensure_tensor(self.shape[dim])),
+            )
+        return Mul.apply(
+            Sum.apply(self, self._ensure_tensor(0)),
+            Inv.apply(self._ensure_tensor(self.size)),
+        )
 
     def permute(self, *dims: int) -> Tensor:
         """Permute the dimensions of the tensor"""
