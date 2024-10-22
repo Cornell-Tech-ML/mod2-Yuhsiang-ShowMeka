@@ -34,11 +34,12 @@ class Linear(minitorch.Module):
         self.out_size = out_features
 
     def forward(self, x):
-        batch, in_features = x.shape
-        return (
-            self.weight.value.view(1, in_features, self.out_size)
-            * x.view(batch, in_features, 1)
-        ).sum(1).view(batch, self.out_size) + self.bias.value.view(self.out_size)
+        x = x.view(*x.shape, 1)
+        w = self.weight.value.view(1, *self.weight.value.shape)
+        x = x * w
+        t = x.sum(1)
+        t = t.view(x.shape[0], self.out_size)
+        return t + self.bias.value.view(1, *self.bias.value.shape)
 
 
 def default_log_fn(epoch, total_loss, correct, losses):
